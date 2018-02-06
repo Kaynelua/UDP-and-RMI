@@ -9,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import common.MessageInfo;
 
@@ -71,10 +72,11 @@ public class UDPClient {
 		try{	
 			DatagramPacket request = new DatagramPacket(pktData, payloadSize, destAddr, destPort);
 			sendSoc.send(request);
-			System.out.println("Sent Message " + payload);
+			//TimeUnit.MILLISECONDS.sleep(10);
+			//System.out.println("Sent Message " + payload);
 		}
 		catch (SocketException e){System.out.println("Socket: " + e.getMessage());}
-		catch (IOException e){System.out.println("IO: " + e.getMessage());}
+		catch (Exception e){System.out.println("IO: " + e.getMessage());}
 		// TO-DO: build the datagram packet and send it to the server
 	}
 }

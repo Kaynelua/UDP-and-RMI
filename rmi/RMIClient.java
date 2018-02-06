@@ -9,6 +9,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import rmi.RMIServerI;
 
+
 import common.MessageInfo;
 
 public class RMIClient {
@@ -39,6 +40,7 @@ public class RMIClient {
 			for(int i=0; i < numMessages ; i ++){
 				MessageInfo m = new MessageInfo(numMessages,i);
 				s.receiveMessage(m);
+				
 				//System.out.println("Message " + i + "sent");
 			}
 
