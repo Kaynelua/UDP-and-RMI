@@ -27,16 +27,15 @@ public class UDPServer {
 		byte[]			pacData;
 		DatagramPacket 	pac;
 		close = false;
-
 		try{
 			pacData = new byte[1000];
 			recvSoc.setSoTimeout(5000); //{TO-DO: Use a timeout (e.g. 30 secs) to ensure the program doesn't block forever}
 			pac = new DatagramPacket(pacData,pacData.length);			
 			while(!close){
 				try{
-					TimeUnit.MILLISECONDS.sleep(100);
-					recvSoc.receive(pac);		//{TO-DO: Receive the message}
-					processMessage(new String(pacData)); // {TO-DO: Receive the messages and process them by calling processMessage(...).
+					//TimeUnit.MILLISECONDS.sleep(100);
+					recvSoc.receive(pac);		
+					processMessage(new String(pacData));
 				}
 				catch(SocketTimeoutException e){
 					System.out.println("TimeOut: " + e.getMessage());
@@ -61,17 +60,14 @@ public class UDPServer {
 
 		try{
 			System.out.println(data.trim());
-			MessageInfo msg = new MessageInfo(data); // {TO-DO: Use the data to construct a new MessageInfo object}
+			MessageInfo msg = new MessageInfo(data); 
 
-			if(totalMessages == -1 ){ // {TO-DO: On receipt of first message, initialise the receive buffer}
+			if(totalMessages == -1 ){
 				receivedMessages = new int[msg.totalMessages];
 				totalMessages = msg.totalMessages;
 			}
-			receivedMessages[msg.messageNum-1] = 1;	//  {TO-DO: Log receipt of the message}
-		/*
-			if(msg.messageNum == msg.totalMessages){ //{TO-DO: If this is the last expected message, then identify any missing messages}
-				close = true;
-			}*/
+			receivedMessages[msg.messageNum-1] = 1;	
+
 		}
 		catch (Exception e){System.out.println("Exception: " + e.getMessage());}
 	
