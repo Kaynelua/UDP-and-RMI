@@ -6,11 +6,10 @@ package rmi;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry; 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
-import java.rmi.RMISecurityManager;
+import java.rmi.*;
 
 import common.*;
 
@@ -24,22 +23,36 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 
 	public void receiveMessage(MessageInfo msg) throws RemoteException {
 
-		if(totalMessages == -1){ 				// TO-DO: On receipt of first message, initialise the receive buffer
-			receivedMessages = new int[msg.totalMessages];
-			totalMessages = msg.totalMessages;
-		}
-		receivedMessages[msg.messageNum-1] = 1;	// TO-DO: Log receipt of the message
-		System.out.println("Receieved msg " + msg.messageNum);
+		// TO-DO: On receipt of first message, initialise the receive buffer
 
-		if( msg.messageNum == totalMessages){// TO-DO: If this is the last expected message, then identify
-			System.out.println("Receipt Done");
-			for(int i=0;i<totalMessages;i++){
-				if(receivedMessages[i] == 0){
-					System.out.println("Missing msg " +  i+1);
-				}
-			}
+		if (totalMessages == -1){
+			totalMessages = msg.totalMessages;
+			receivedMessages = new int[totalMessages];		
 		}
+
+			receivedMessages[msg.messageNum] = 1;
+			System.out.println ("Message " + msg.messageNum  );
+			
+			if(msg.messageNum == msg.totalMessages-1) {
+				int numReceived = 0;
+				for(int i=0; i <msg.totalMessages ;i++){
+					if(receivedMessages[i] == 1){
+						numReceived = numReceived +1;
+					}
+					
+					else{
+						System.out.println ("Message " + i + " was not received" );
+					}
+				}
+				System.out.println ("Total number of messages received = " + numReceived + " out of " + msg.totalMessages );	
 		
+		
+		}
+
+		// TO-DO: Log receipt of the message
+
+		// TO-DO: If this is the last expected message, then identify
+		//        any missing messages
 
 	}
 
@@ -47,33 +60,40 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerI {
 	public static void main(String[] args) {
 
 		RMIServer rmis = null;
-		if(System.getSecurityManager() == null){
-			System.setSecurityManager(new RMISecurityManager());	// {TO-DO: Initialise Security Manager}
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager (new RMISecurityManager());
 		}
-		try{
-			rmis = new RMIServer();										// TO-DO: Instantiate the server class
-			rebindServer("RMIServer", rmis);			// TO-DO: Bind to RMI registry
-		}
-		catch(Exception e){
-			System.out.println("Trouble: " + e);
-		}
+		try {
+		
+			rmis = new RMIServer();
+			String URL = "RMIServer";
+			rebindServer(URL,rmis);
+		} catch(Exception e) { System.out.println ("Exception : " + e.getMessage()); }
+
+		// TO-DO: Initialise Security Manager
+
+		// TO-DO: Instantiate the server class
+
+		// TO-DO: Bind to RMI registry
+
 	}
 
 	protected static void rebindServer(String serverURL, RMIServer server) {
-		try{
-			// TO-DO:
-			// Start / find the registry (hint use LocateRegistry.createRegistry(...)
-			// If we *know* the registry is running we could skip this (eg run rmiregistry in the start script)
-			Registry r = LocateRegistry.createRegistry(1099);
-			// TO-DO:
-			// Now rebind the server to the registry (rebind replaces any existing servers bound to the serverURL)
-			// Note - Registry.rebind (as returned by createRegistry / getRegistry) does something similar but
-			// expects different things from the URL field.
-			Naming.rebind(serverURL,server);
-		}
-		catch(Exception e){
-			System.out.println("Trouble: " + e);
-		}
+		try {
+			LocateRegistry.createRegistry(1099);
+		} catch (RemoteException e) {System.out.println ("Exception : " + e.getMessage());}
 
+		try {		
+			Naming.rebind(serverURL, server);
+
+		} catch (Exception e) {System.out.println ("Exception : " + e.getMessage());}
+		// TO-DO:
+		// Start / find the registry (hint use LocateRegistry.createRegistry(...)
+		// If we *know* the registry is running we could skip this (eg run rmiregistry in the start script)
+
+		// TO-DO:
+		// Now rebind the server to the registry (rebind replaces any existing servers bound to the serverURL)
+		// Note - Registry.rebind (as returned by createRegistry / getRegistry) does something similar but
+		// expects different things from the URL field.
 	}
 }
