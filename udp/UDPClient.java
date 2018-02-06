@@ -37,49 +37,44 @@ public class UDPClient {
 		recvPort = Integer.parseInt(args[1]);
 		countTo = Integer.parseInt(args[2]);
 
-		UDPClient client = new UDPClient(); //{TO-DO: Construct UDP client class and try to send messages}
-		
-		//////////////////////////////// prototype
+		// TO-DO: Construct UDP client class and try to send messages
+		UDPClient myClient = new UDPClient();
+		long startTime = System.currentTimeMillis();
+		myClient.testLoop(serverAddr,recvPort,countTo);
 
-		client.testLoop(serverAddr,recvPort,countTo);
+		long endTime = System.currentTimeMillis();
 
-
-		////////////////////////////////
+		System.out.println("That took " + (endTime - startTime) + " milliseconds");	
 	}
 
 	public UDPClient() {
-		try{
-			sendSoc = new DatagramSocket(); // {TO-DO: Initialise the UDP socket for sending data}
-		}
-		catch (SocketException e){System.out.println("Socket: " + e.getMessage());}
-	}
-
-	private void testLoop(InetAddress serverAddr, int recvPort, int countTo) {
-		int				tries = 0;
-		for(tries=0;tries<countTo;tries++){
-			try{
-				MessageInfo msg = new MessageInfo(countTo,tries+1);
-				this.send(msg.toString(),serverAddr,recvPort); // TO-DO: Send the messages to the server
-			}
-			catch (Exception e){System.out.println("Exception: " + e.getMessage());}
-		}
+		// TO-DO: Initialise the UDP socket for sending data
+		try { sendSoc = new DatagramSocket(); // creates socket on any available port no.
+		}catch (SocketException e){System.out.println("Socket: " + e.getMessage());}
 		
 	}
 
-	private void send(String payload, InetAddress destAddr, int destPort) {
-		int				payloadSize;
-		byte[]				pktData;
-		DatagramPacket		pkt;
-
-		try{
-			pktData = payload.getBytes();
-			payloadSize = pktData.length;
-
-			pkt = new DatagramPacket(pktData,payloadSize,destAddr,destPort);
-			sendSoc.send(pkt);
+	private void testLoop(InetAddress serverAddr, int recvPort, int countTo) {
+		int tries = 1;
+		while(tries <= countTo){
+			// TO-DO: Send the messages to the server
+			MessageInfo info =new MessageInfo(countTo,tries);
+			send(info.toString(),serverAddr,recvPort);
+			//System.out.println("Sending Message No. " + tries);
+			tries ++;
 		}
-		catch (IOException e){System.out.println("IO: " + e.getMessage());}
+	}
 
+	private void send(String payload, InetAddress destAddr, int destPort) {
+		int	payloadSize = payload.length();
+		byte[]	pktData = payload.getBytes();
+		try{	
+			DatagramPacket request = new DatagramPacket(pktData, payloadSize, destAddr, destPort);
+			sendSoc.send(request);
+			System.out.println("Sent Message " + payload);
+		}
+		catch (SocketException e){System.out.println("Socket: " + e.getMessage());}
+		catch (IOException e){System.out.println("IO: " + e.getMessage());}
 		// TO-DO: build the datagram packet and send it to the server
 	}
 }
