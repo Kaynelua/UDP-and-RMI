@@ -18,8 +18,8 @@ import common.MessageInfo;
 public class UDPServer {
 
 	private DatagramSocket recvSoc;
-	private int totalMessages = -1;		//no clue
-	private int[] receivedMessages;		//tracking what is received/lost
+	private int totalMessages = -1;		
+	private int[] receivedMessages;		
 	private boolean close;
 
 	private void run() {
@@ -29,11 +29,10 @@ public class UDPServer {
 		close = false;
 		try{
 			pacData = new byte[1000];
-			recvSoc.setSoTimeout(5000); //{TO-DO: Use a timeout (e.g. 30 secs) to ensure the program doesn't block forever}
+			recvSoc.setSoTimeout(5000);
 			pac = new DatagramPacket(pacData,pacData.length);			
 			while(!close){
 				try{
-					//TimeUnit.MILLISECONDS.sleep(100);
 					recvSoc.receive(pac);		
 					processMessage(new String(pacData));
 				}
@@ -57,27 +56,24 @@ public class UDPServer {
 	}
 
 	public void processMessage(String data) {
-
 		try{
 			System.out.println(data.trim());
 			MessageInfo msg = new MessageInfo(data); 
 
 			if(totalMessages == -1 ){
-				receivedMessages = new int[msg.totalMessages];
+				receivedMessages = new int[msg.totalMessages]; //initialise array length of totalMessages
 				totalMessages = msg.totalMessages;
 			}
 			receivedMessages[msg.messageNum-1] = 1;	
 
 		}
 		catch (Exception e){System.out.println("Exception: " + e.getMessage());}
-	
-
 	}
 
 
 	public UDPServer(int rp) {
 		try{
-			recvSoc = new DatagramSocket(rp); // {TO-DO: Initialise UDP socket for receiving data}, port cannot be <1024	
+			recvSoc = new DatagramSocket(rp); //Port cannot be <1024	
 		}
 		catch (SocketException e){System.out.println("Socket: " + e.getMessage());}
 		// Done Initialisation
@@ -96,7 +92,7 @@ public class UDPServer {
 		recvPort = Integer.parseInt(args[0]);
 		UDPServer server = new UDPServer(recvPort); 
 		server.run();
-		// TO-DO: Construct Server object and start it by calling run().
+		//Construct Server object and start it by calling run().
 	}
 
 }
